@@ -1,0 +1,43 @@
+version: '3.8'
+
+services:
+  redis:
+    image: "redis:alpine"
+    command: redis-server
+  celery:
+    build: .
+    command: celery -A BookCatalog worker -l INFO
+    volumes:
+        - .:/code
+    depends_on:
+        - web
+        - redis
+  db:
+    image: postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: postgres
+    volumes:
+      - db_data:/var/lib/postgresql/data/
+  web:
+    build: .
+    command: >
+      bash -c "
+        python manage.py makemigrations &&
+        python manage.py migrate &&
+        python manage.py runserver 0.0.0.0:8000
+      "
+    volumes:
+      - .:/code/
+    environment:
+      - POSTGRES_NAME=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+
+volumes:
+  db_data:
