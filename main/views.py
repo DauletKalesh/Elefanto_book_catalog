@@ -1,4 +1,4 @@
-from rest_framework import views, status, generics, mixins, viewsets, permissions
+from rest_framework import status, generics, viewsets, permissions
 from rest_framework.response import Response
 from main.models import Genre, Author, Book, Review, Favorite
 from main.serializers import GenreSerializer, \
